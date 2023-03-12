@@ -54,7 +54,7 @@ export default class GameController {
   onCellClick(index) {
     // TODO: react to click
     const hero = this.gameState.teams.find((elem) => elem.position === index);
-    if (hero && hero.character.player === command.USER) {
+    if (hero && hero.character.player === command.human) {
       if (this.gameState.selectedHero) this.gamePlay.deselectCell(this.gameState.selectedHero.position);
       this.gamePlay.selectCell(index);
       this.gameState.availableSteps = getAvailableDistance(index, hero.character.stepsRadius);
@@ -73,17 +73,17 @@ export default class GameController {
         this.checkLevel();
       }
       // Если в поле есть противник атакуем
-      if (hero && hero.character.player === command.COMP && this.gameState.availableAttack.includes(index)) {
+      if (hero && hero.character.player === command.enemy && this.gameState.availableAttack.includes(index)) {
         this.attack(hero, this.gameState.selectedHero, index);
       }
       // Сообщение
-      if (hero && hero.character.player === command.COMP && !this.gameState.availableAttack.includes(index)) {
+      if (hero && hero.character.player === command.enemy && !this.gameState.availableAttack.includes(index)) {
         this.gamePlay.showPopup('Это слишком далеко!');
       }
       return;
     }
     // Сообщения об ошибке
-    if (!this.gameState.selectedHero && hero && hero.character.player === command.COMP) {
+    if (!this.gameState.selectedHero && hero && hero.character.player === command.enemy) {
       let { type } = hero.character;
       type = type[0].toUpperCase() + type.slice(1);
       this.gamePlay.showPopup(`Это ${type}! Он наш враг!`);
@@ -145,7 +145,7 @@ export default class GameController {
    */
   activeCursor(hero) {
     if (hero) {
-      const pointer = hero.character.player === command.USER ? cursors.pointer : cursors.notallowed;
+      const pointer = hero.character.player === command.human ? cursors.pointer : cursors.notallowed;
       this.gamePlay.setCursor(pointer);
     } else {
       this.gamePlay.setCursor(cursors.auto);
@@ -161,10 +161,10 @@ export default class GameController {
     if (this.gameState.availableSteps.includes(index) && !hero) {
       this.gamePlay.setCursor(cursors.pointer);
       this.gamePlay.selectCell(index, 'green');
-    } else if (hero && hero.character.player === command.COMP && this.gameState.availableAttack.includes(index)) {
+    } else if (hero && hero.character.player === command.enemy && this.gameState.availableAttack.includes(index)) {
       this.gamePlay.setCursor(cursors.crosshair);
       this.gamePlay.selectCell(index, 'red');
-    } else if (hero && hero.character.player === command.USER) {
+    } else if (hero && hero.character.player === command.human) {
       this.gamePlay.setCursor(cursors.pointer);
     } else {
       this.gamePlay.setCursor(cursors.notallowed);
@@ -212,7 +212,7 @@ export default class GameController {
       this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
     }
     const totalScores = this.gameState ? this.gameState.scores : 0;
-    this.gameState = new GameState(1, [], command.USER, totalScores);
+    this.gameState = new GameState(1, [], command.human, totalScores);
     this.nextStage(this.gameState.stage);
   }
 
@@ -220,9 +220,9 @@ export default class GameController {
    * Переход хода
    */
   nextPlayer() {
-    this.gameState.motion = (this.gameState.motion === command.USER) ? command.COMP : command.USER;
+    this.gameState.motion = (this.gameState.motion === command.human) ? command.enemy : command.human;
     // console.log('Ход переходит к:', this.gameState.motion);
-    if (this.gameState.motion === command.COMP) {
+    if (this.gameState.motion === command.enemy) {
       this.computerLogic();
     }
     this.gameState.clear();
@@ -232,8 +232,8 @@ export default class GameController {
    * Проверка окончания уровня
    */
   checkLevel() {
-    const userValue = this.gameState.teams.some((member) => member.character.player === command.USER);
-    const computerValue = this.gameState.teams.some((member) => member.character.player === command.COMP);
+    const userValue = this.gameState.teams.some((member) => member.character.player === command.human);
+    const computerValue = this.gameState.teams.some((member) => member.character.player === command.enemy);
     if (userValue && computerValue) {
       this.nextPlayer();
       return;
@@ -264,10 +264,10 @@ export default class GameController {
       this.constructor.levelUp.call(this);
       // + к команде user
       const count = (stage === 2) ? 1 : 2;
-      this.constructor.teamGeneration.call(this, userTypes, command.USER, stage - 1, count);
+      this.constructor.teamGeneration.call(this, userTypes, command.human, stage - 1, count);
       // новая команда компа
-      const userCount = this.gameState.teams.filter((member) => member.character.player === command.USER).length;
-      this.constructor.teamGeneration.call(this, computerTypes, command.COMP, stage, userCount);
+      const userCount = this.gameState.teams.filter((member) => member.character.player === command.human).length;
+      this.constructor.teamGeneration.call(this, computerTypes, command.enemy, stage, userCount);
       this.gamePlay.showPopup(`Уровень ${stage} Счет: ${this.gameState.scores}`);
     }
 
@@ -318,8 +318,8 @@ export default class GameController {
    */
   computerLogic() {
     const { teams } = this.gameState;
-    const computerTeams = teams.filter((member) => member.character.player === command.COMP);
-    const userTeams = teams.filter((member) => member.character.player === command.USER);
+    const computerTeams = teams.filter((member) => member.character.player === command.enemy);
+    const userTeams = teams.filter((member) => member.character.player === command.human);
     // Проверяем возможность атаки
     const attack = computerTeams.some((compUnit) => {
       this.gameState.availableAttack = getAvailableAttack(compUnit.position, compUnit.character.attackRadius);
@@ -347,7 +347,7 @@ export default class GameController {
   static levelUp() {
     for (const member of this.gameState.teams) {
       const parameter = member.character;
-      member.position = startFieldGenerator(command.USER); // Возвращаем игроков с свои поля
+      member.position = startFieldGenerator(command.human); // Возвращаем игроков с свои поля
       parameter.level += 1;
       parameter.health = parameter.health + 80 >= 100 ? 100 : parameter.health + 80;
       parameter.attack = Math.floor(Math.max(parameter.attack, parameter.attack * (0.8 + parameter.health / 100)));

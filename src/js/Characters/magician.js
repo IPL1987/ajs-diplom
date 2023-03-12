@@ -1,18 +1,13 @@
 import Character from '../Character';
-import teamsParam from '../defaults/teamsParam';
 
 export default class Magician extends Character {
   constructor(level) {
-    const {
-      type,
-      attack,
-      defence,
-      player,
-      stepsRadius,
-      attackRadius,
-    } = teamsParam[new.target.name];
-
-    super(level, attack, defence, player, stepsRadius, attackRadius);
-    this.type = type;
+    super(level);
+    this.type = 'magician';
+    this.attack = 10;
+    this.defence = 40;
+    this.player = 'player';
+    this.stepsRadius = 1;
+    this.attackRadius = 4;
   }
 }

@@ -1,18 +1,13 @@
 import Character from '../Character';
-import teamsParam from '../defaults/teamsParam';
 
 export default class Bowman extends Character {
   constructor(level) {
-    const {
-      type,
-      attack,
-      defence,
-      player,
-      stepsRadius,
-      attackRadius,
-    } = teamsParam[new.target.name];
-
-    super(level, attack, defence, player, stepsRadius, attackRadius);
-    this.type = type;
+    super(level);
+    this.type = 'bowman';
+    this.attack = 25;
+    this.defence = 25;
+    this.player = 'player';
+    this.stepsRadius = 2;
+    this.attackRadius = 2;
   }
 }

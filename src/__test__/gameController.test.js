@@ -26,10 +26,10 @@ describe('Проверка типов курсора', () => {
     jest.resetAllMocks();
   });
 
-  test('Курсор над игроком user', () => {
+  test('Курсор над игроком human', () => {
     const data = {
       character: {
-        player: command.USER,
+        player: command.human,
       },
     };
     gameController.activeCursor(data);
@@ -39,7 +39,7 @@ describe('Проверка типов курсора', () => {
   test('Курсор над computer', () => {
     const data = {
       character: {
-        player: command.COMP,
+        player: command.enemy,
       },
     };
     gameController.activeCursor(data);
@@ -73,7 +73,7 @@ describe('Выделение ячейки поля', () => {
   test('Выделение поля для атаки', () => {
     const data = {
       character: {
-        player: command.COMP,
+        player: command.enemy,
       },
     };
     gameController.gameState = {

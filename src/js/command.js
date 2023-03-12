@@ -1,6 +1,6 @@
 const command = {
-  COMP: 'computer',
-  USER: 'user',
+  enemy: 'computer',
+  human: 'player',
 };
 
 export default command;
