@@ -221,7 +221,6 @@ export default class GameController {
    */
   nextPlayer() {
     this.gameState.motion = (this.gameState.motion === command.human) ? command.enemy : command.human;
-    // console.log('Ход переходит к:', this.gameState.motion);
     if (this.gameState.motion === command.enemy) {
       this.computerLogic();
     }
@@ -255,17 +254,17 @@ export default class GameController {
    */
   nextStage(stage) {
     if (stage === 1) {
-      this.constructor.teamGeneration.call(this, userTypes, command.USER, 1, 2);
-      this.constructor.teamGeneration.call(this, computerTypes, command.COMP, 1, 2);
+      this.constructor.teamGeneration.call(this, userTypes, command.human, 1, 2);
+      this.constructor.teamGeneration.call(this, computerTypes, command.enemy, 1, 2);
     }
 
     if (stage > 1 && stage < 5) {
       // Повышаем уровень оставшихся
       this.constructor.levelUp.call(this);
-      // + к команде user
+      // + к команде human
       const count = (stage === 2) ? 1 : 2;
       this.constructor.teamGeneration.call(this, userTypes, command.human, stage - 1, count);
-      // новая команда компа
+      // новая команда enemy
       const userCount = this.gameState.teams.filter((member) => member.character.player === command.human).length;
       this.constructor.teamGeneration.call(this, computerTypes, command.enemy, stage, userCount);
       this.gamePlay.showPopup(`Уровень ${stage} Счет: ${this.gameState.scores}`);
@@ -319,11 +318,11 @@ export default class GameController {
   computerLogic() {
     const { teams } = this.gameState;
     const computerTeams = teams.filter((member) => member.character.player === command.enemy);
-    const userTeams = teams.filter((member) => member.character.player === command.human);
+    const humanTeams = teams.filter((member) => member.character.player === command.human);
     // Проверяем возможность атаки
     const attack = computerTeams.some((compUnit) => {
       this.gameState.availableAttack = getAvailableAttack(compUnit.position, compUnit.character.attackRadius);
-      const attacked = userTeams.find((userUnit) => this.gameState.availableAttack.includes(userUnit.position));
+      const attacked = humanTeams.find((userUnit) => this.gameState.availableAttack.includes(userUnit.position));
       if (attacked) {
         this.attack(attacked, compUnit, attacked.position);
         return true;
@@ -331,7 +330,7 @@ export default class GameController {
       return false;
     });
     // Ход computer
-    if (!attack && computerTeams.length && userTeams.length) {
+    if (!attack && computerTeams.length && humanTeams.length) {
       const unit = Math.floor(Math.random() * computerTeams.length);
       const steps = getAvailableDistance(computerTeams[unit].position, computerTeams[unit].character.stepsRadius);
       const step = Math.floor(Math.random() * steps.length);
@@ -347,7 +346,7 @@ export default class GameController {
   static levelUp() {
     for (const member of this.gameState.teams) {
       const parameter = member.character;
-      member.position = startFieldGenerator(command.human); // Возвращаем игроков с свои поля
+      member.position = startFieldGenerator(command.human); // Возвращаем игроков на свои поля
       parameter.level += 1;
       parameter.health = parameter.health + 80 >= 100 ? 100 : parameter.health + 80;
       parameter.attack = Math.floor(Math.max(parameter.attack, parameter.attack * (0.8 + parameter.health / 100)));
@@ -360,7 +359,7 @@ export default class GameController {
    * @param {*} prayer - Тип игрока 'user' или 'computer'
    * @returns - Массив объектов типа PositionedCharacter
    */
-  static teamGeneration(teamType, prayer, maxLevel, count) {
+  static teamGeneration(teamType, player, maxLevel, count) {
     // Генерируем новую команду
     let newTeam = generateTeam(teamType, maxLevel, count);
     // Список занятых на поле позиций
@@ -371,10 +370,10 @@ export default class GameController {
     // Добавляем позиции новым персонажам
     newTeam = newTeam.toArray.reduce((acc, member) => {
       // Случайная позиция персонажа из списка доступных
-      let randomNumber = startFieldGenerator(prayer);
+      let randomNumber = startFieldGenerator(player);
       // Если есть такая позиция уже есть генерируем новую
       while (positionList.includes(randomNumber)) {
-        randomNumber = startFieldGenerator(prayer);
+        randomNumber = startFieldGenerator(player);
       }
       positionList.push(randomNumber);
       acc.push(new PositionedCharacter(member, randomNumber));

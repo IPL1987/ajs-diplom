@@ -7,11 +7,12 @@ import command from './command';
  * @param maxLevel max character level
  * @returns Character type children (ex. Magician, Bowman, etc)
  */
+
 export function characterGenerator(allowedTypes, maxLevel) {
   // TODO: write logic here
-  const randomType = Math.floor(Math.random() * allowedTypes.length);
+  const randomCharType = Math.floor(Math.random() * allowedTypes.length);
   const randomLevel = Math.floor(Math.random() * maxLevel) + 1;
-  return new allowedTypes[randomType](randomLevel);
+  return new allowedTypes[randomCharType](randomLevel);
 }
 
 export function generateTeam(allowedTypes, maxLevel, characterCount) {
@@ -23,31 +24,18 @@ export function generateTeam(allowedTypes, maxLevel, characterCount) {
   return team;
 }
 
-/**
- * Генерирует случное поле для первого уровня
- * @param {*} player - Игрок 'user' или 'computer'
- * @returns номер поля :number
- */
 export function startFieldGenerator(player) {
   const boardSize = 8;
   const cellsCount = boardSize ** 2 - 1;
   const validateCells = [];
-  const startCell = player === command.USER ? 0 : boardSize - 2;
+  const startCell = player === command.human ? 0 : boardSize - 2;
   for (let i = startCell; i <= cellsCount; i += boardSize) {
     validateCells.push(i, i + 1);
   }
-
-  // Для случайного номера ячейки
   const randomIndex = Math.floor(Math.random() * validateCells.length);
   return validateCells[randomIndex];
 }
 
-/**
- * Генерирует массив возможных вариантов хода
- * @param {number} index - Текущее положение
- * @param {number} radius - Радиус хода
- * @returns {Array} - Массив чисел
- */
 export function getAvailableDistance(index, radius) {
   const allowableSteps = new Set();
   let topCell = index;
