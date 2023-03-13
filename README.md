@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/nt1tb7giv311bpdg/branch/master?svg=true)](https://ci.appveyor.com/project/IPL1987/ajs-diplom/branch/master)
+
 # Дипломное задание к курсу «Продвинутый JavaScript». Retro Game
 
 ###### tags: `netology` `advanced js`
