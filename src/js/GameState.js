@@ -42,7 +42,7 @@ export default class GameState {
    */
   addScores() {
     const sum = this.teams.reduce((acc, member) => {
-      if (member.character.player === 'user') {
+      if (member.character.player === 'player') {
         return acc + member.character.health;
       }
       return acc;
