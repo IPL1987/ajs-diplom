@@ -198,7 +198,7 @@ export default class GameController {
         this.newGame();
       }
     } catch (error) {
-      this.constructor.clearLocalStorage('state');
+      GameController.clearLocalStorage('state');
       this.gamePlay.showPopup(`Ошибка загрузки: "${error.message}"`);
       this.newGame();
     }
@@ -380,13 +380,5 @@ export default class GameController {
       return acc;
     }, []);
     this.gameState.teams.push(...newTeam);
-  }
-
-  /**
- * Очищает локальное хранилище
- * @param {string} key - значение по которому очистить localStorage;
- */
-  static clearLocalStorage(key) {
-    localStorage.removeItem(key);
   }
 }
