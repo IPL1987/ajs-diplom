@@ -33,6 +33,8 @@ export default class GameController {
    */
   init() {
     this.loadGame();
+    this.checkCell();
+    this.newGame();
   }
 
   checkCell() {
@@ -185,9 +187,6 @@ export default class GameController {
    */
   loadGame() {
     // Чтобы не добавлялись лишние события при загрузке во время игры
-    if (this.gamePlay.cellClickListeners.length === 0) {
-      this.checkCell();
-    }
     try {
       const load = this.stateService.load();
       if (load) {
